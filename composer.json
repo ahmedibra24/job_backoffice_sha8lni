@@ -10,15 +10,15 @@
     "license": "MIT",
     "repositories": [
         {
-        "type":"path",
-        "url":"../job-shared"
-    }
+            "type": "vcs",
+            "url": "https://github.com/ahmedibra24/job_shared_sha8lni.git"
+        }
     ],
     "require": {
         "php": "^8.2",
         "laravel/framework": "^12.0",
         "laravel/tinker": "^2.10.1",
-        "job/shared":"*"
+        "job/shared": "*"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
