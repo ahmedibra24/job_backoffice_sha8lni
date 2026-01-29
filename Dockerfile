@@ -55,7 +55,7 @@ RUN composer dump-autoload --optimize
 RUN npm run build
 
 # Set permissions
-RUN chown -R www-data:www-data /app/storage /app/bootstrap/cache
+RUN chmod -R 775 storage bootstrap/cache
 
 # Copy Caddyfile (configuration for http server)
 COPY Caddyfile /etc/caddy/Caddyfile
@@ -65,4 +65,7 @@ EXPOSE 80
 EXPOSE 443
 
 # Start FrankenPHP
-CMD ["frankenphp", "run", "--config", "/etc/caddy/Caddyfile"] 
+CMD php artisan config:cache && \
+    php artisan route:cache && \
+    php artisan view:cache && \
+    frankenphp run --config /etc/caddy/Caddyfile
