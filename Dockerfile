@@ -34,7 +34,7 @@ WORKDIR /app
 COPY composer.json composer.lock ./
 
 # Install Composer dependencies
-RUN composer install --no-dev --no-scripts --no-autoloader --prefer-dist
+RUN composer install --no-scripts --no-autoloader
 
 # Copy package files
 COPY package.json package-lock.json ./
@@ -55,7 +55,7 @@ RUN composer dump-autoload --optimize
 RUN npm run build
 
 # Set permissions
-RUN chmod -R 775 storage bootstrap/cache
+RUN chown -R www-data:www-data /app/storage /app/bootstrap/cache
 
 # Copy Caddyfile (configuration for http server)
 COPY Caddyfile /etc/caddy/Caddyfile
