@@ -63,3 +63,7 @@ COPY Caddyfile /etc/caddy/Caddyfile
 EXPOSE 80
 EXPOSE 443
 
+CMD php artisan config:cache && \
+    php artisan route:cache && \
+    php artisan view:cache && \
+    php -S 0.0.0.0:80 -t public
