@@ -65,7 +65,4 @@ EXPOSE 80
 EXPOSE 443
 
 # Start FrankenPHP
-CMD php artisan config:cache && \
-    php artisan route:cache && \
-    php artisan view:cache && \
-    frankenphp run --config /etc/caddy/Caddyfile
+CMD ["frankenphp", "run", "--config", "/etc/caddy/Caddyfile"] 
