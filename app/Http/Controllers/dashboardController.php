@@ -53,7 +53,7 @@ class dashboardController extends Controller
 
         //! better to calculate it in query
         $conversionRates=JobVacancy::withCount('jobApplications as total_applications')
-        ->having('total_applications','>',0)
+        ->has('jobApplications')
         ->orderBy('total_applications','desc')
         ->limit(5)
         ->get()
@@ -130,7 +130,7 @@ class dashboardController extends Controller
         //! -----------------conversion rates for this company's jobs (# of applications / # of views)---------------*/
         $conversionRates=JobVacancy::withCount('jobApplications as total_applications')
         ->where('company_id', $company->id)
-        ->having('total_applications','>',0)
+        ->has('jobApplications')
         ->orderBy('total_applications','desc')
         ->limit(5)
         ->get()
