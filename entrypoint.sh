@@ -26,5 +26,5 @@ php artisan migrate --force
 php artisan db:seed --force
 
 
-echo "Starting FrankenPHP..."
-exec frankenphp run --config /etc/caddy/Caddyfile
+echo "Starting Laravel server..."
+exec php -S 0.0.0.0:80 -t public
