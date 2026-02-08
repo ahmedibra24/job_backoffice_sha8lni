@@ -11,7 +11,7 @@ RUN apt-get update && apt-get install -y \
     zip \
     unzip \
     poppler-utils \
-    default-mysql-client \
+    libpq-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Node.js
@@ -19,10 +19,12 @@ RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
     apt-get install -y nodejs
 
 # Install PHP extensions
-# mysqli -> give you access or interaction to mysql
 RUN install-php-extensions \
-    pdo_mysql \
-    mysqli
+    pdo_pgsql \
+    pgsql \
+    gd \
+    intl \
+    zip
 
 # Install Composer like installation you made locally on windows
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
@@ -59,11 +61,13 @@ RUN chown -R www-data:www-data /app/storage /app/bootstrap/cache
 # Copy Caddyfile (configuration for http server)
 COPY Caddyfile /etc/caddy/Caddyfile
 
+# Copy entrypoint
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+
 # Expose ports
 EXPOSE 80
 EXPOSE 443
 
-CMD php artisan config:cache && \
-    php artisan route:cache && \
-    php artisan view:cache && \
-    php -S 0.0.0.0:80 -t public
+CMD ["/entrypoint.sh"]
