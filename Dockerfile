@@ -11,7 +11,7 @@ RUN apt-get update && apt-get install -y \
     zip \
     unzip \
     poppler-utils \
-    libpq-dev \
+    default-mysql-client \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Node.js
@@ -20,12 +20,9 @@ RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
 
 # Install PHP extensions
 RUN install-php-extensions \
-    pdo_pgsql \
-    pgsql \
-    gd \
-    intl \
-    zip
-
+    pdo_mysql \
+    mysqli
+    
 # Install Composer like installation you made locally on windows
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
