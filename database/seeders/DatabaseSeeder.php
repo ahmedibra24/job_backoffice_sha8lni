@@ -12,6 +12,11 @@ use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Testing\Fluent\Concerns\Has;
+use Faker\factory as Faker;
+//! composer require fakerphp/faker  
+//! yes   
+
+
 
 
 class DatabaseSeeder extends Seeder
@@ -25,6 +30,8 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
         //* ---------------------------crate admin -------------------------------
+        $faker = Faker::create();
+
         //? Get the first record matching the attributes. If the record is not found, create it.
         User::firstOrCreate([
             'email' => 'admin@admin.com',
@@ -55,9 +62,9 @@ class DatabaseSeeder extends Seeder
 
             //! create owner user
             $owner=User::firstOrCreate([
-                'email' => fake()->unique()->safeEmail(),
+                'email' => $faker->unique()->safeEmail(),
             ],[
-                'name' => fake()->name(),
+                'name' => $faker->name(),
                 'password' => Hash::make('12345678'),
                 'role' => 'recruiter',
                 'email_verified_at' => now(),
@@ -67,7 +74,7 @@ class DatabaseSeeder extends Seeder
             Company::firstOrCreate([
                 'name'=>$company['name']
             ],[
-                'email'=>fake()->unique()->safeEmail(),
+                'email'=>$faker->unique()->safeEmail(),
                 'address'=>$company['address'],
                 'industry'=>$company['industry'],
                 'website'=>$company['website'],
@@ -103,9 +110,9 @@ class DatabaseSeeder extends Seeder
 
             //! create applicant user
             $applicantData = User::firstOrCreate([
-                'email' => fake()->unique()->safeEmail(),
+                'email' => $faker->unique()->safeEmail(),
             ],[
-                'name' => fake()->name(),
+                'name' => $faker->name(),
                 'password' => Hash::make('12345678'),
                 'role' => 'applicant',
                 'email_verified_at' => now(),
