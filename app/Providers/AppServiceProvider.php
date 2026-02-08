@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\URL;
+
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -19,6 +21,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+         /*! Force HTTPS in production environment
+         * This is important when your application is behind a load balancer or proxy that terminates SSL.
+         * It ensures that all generated URLs use the HTTPS scheme, which is crucial for security and proper functioning of the application.
+         */
+        if ($this->app->environment('production')) {
+            URL::forceScheme('https');
+        }
+
     }
 }
