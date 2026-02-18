@@ -10,6 +10,8 @@ use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Pest\Matchers\Any;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 
 class companyController extends Controller
 {
@@ -31,7 +33,7 @@ class companyController extends Controller
     'Agriculture',
     'Government',
     ]; 
-    //* ---------------------------------------- index--------------------------------- */ 
+    //* ---------------------------------------- index --------------------------------- */ 
     public function index(Request $request)
     {
         //! check if archived query param exists to show archived companies
@@ -55,29 +57,68 @@ class companyController extends Controller
     //* ---------------------------------------- store--------------------------------- */
     public function store(companyRequest $request)
     {
-        //! create owner user
-        $owner= User::create([
-            'name' => $request->input('owner_name'),
-            'email' => $request->input('owner_email'),
-            'password' => Hash::make($request->input('owner_password')),
-            'role' => 'recruiter',
-        ]);
+        DB::beginTransaction();
+        try{
+            //! validate and extract logo file
+            $file = $request->file('logo'); // uploaded file
+            $extension = $file->getClientOriginalExtension();
+            $originalFileName = $file->getClientOriginalName(); // stored in DB
+            $fileName = 'logo_' . time() . '.' . $extension; // unique storage name
 
-        //! check if owner created successfully because it is required for company
-        if(!$owner){
-            return redirect()->back()->with('error', 'Failed to create owner user');
+            //! store in cloud (public visibility)
+            // Returns a relative path like "logos/logo_123456.png"
+            $path=$file->storeAs('logos',$fileName,'cloud',[
+               'disk'=>'cloud',
+               'visibility' => 'public'
+            ]);
+            if (!$path) {
+            throw new \Exception('Failed to upload logo to storage.');
+            }
+
+            // dd([$path,$originalFileName,config('filesystems.disks.cloud.url').'/'.$path]);
+
+            config('filesystems.disks.cloud.url').'/'.$path ;//? final url to display the file from cloud
+            //! create owner user
+            $owner = User::create([
+                'name' => $request->input('owner_name'),
+                'email' => $request->input('owner_email'),
+                'password' => Hash::make($request->input('owner_password')),
+                'role' => 'recruiter',
+            ]);
+
+            //! check if owner created successfully because it is required for company
+            if (!$owner) {
+                // delete image from cloud if owner creation failed
+                if (isset($path)) {
+                    Storage::disk('cloud')->delete($path);
+                }
+                return redirect()->back()->with('error', 'Failed to create owner user');
+            }
+            // dd(Company::getFillable());
+            //! create company 
+
+            $company = new Company();
+            $company->name = $request->input('name');
+            $company->email = $request->input('email');
+            $company->address = $request->input('address');
+            $company->industry = $request->input('industry');
+            $company->website = $request->input('website');
+            $company->logoName = $originalFileName;
+            $company->logoUri = $path; // should not contain the domain
+            $company->owner_id = $owner->id;
+            $company->save();
+            DB::commit();
+            return  redirect()->route('company.index')->with('success', 'Company created successfully');
+        }catch (\Exception $e) {
+            DB::rollBack();
+            // delete image from cloud if exists to avoid orphan files
+            if (isset($path)) {
+                Storage::disk('cloud')->delete($path);
+            }
+
+            // TEMPORARY - show full error with trace
+            return back()->withInput()->with('error', 'Something went wrong - ' . $e->getMessage() . ' | File: ' . $e->getFile() . ' | Line: ' . $e->getLine());
         }
-        //! create company
-        Company::create([
-            'name' => $request->input('name'),
-            'email' => $request->input('email'),
-            'address' => $request->input('address'),
-            'industry' => $request->input('industry'),
-            'website' => $request->input('website'),
-            'owner_id' => $owner->id,
-        ]);
-
-        return  redirect()->route('company.index')->with('success', 'Company created successfully');
     }
     //* ---------------------------------------- get company--------------------------------- */
 

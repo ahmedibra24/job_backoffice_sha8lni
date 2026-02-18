@@ -27,6 +27,7 @@ class companyRequest extends FormRequest
             'address' => 'required|string|max:500',
             'industry' => 'required|string|max:255',
             'website' => 'nullable|url|max:255',
+            'logo' => 'required|image|mimes:jpg,jpeg,png|max:1024',
             'owner_name' => 'required|string|max:255',
             'owner_email' => 'required|email|max:255|unique:users,email,',
             'owner_password' => 'required|string|min:8',
@@ -61,6 +62,13 @@ class companyRequest extends FormRequest
             'owner_password.required' => 'Owner password is required.',
             'owner_password.string' => 'Owner password must be a string.',
             'owner_password.min' => 'Owner password must be at least 8 characters.',
+            'logo.required' => 'Company logo is required.',
+            'logo.image'    => 'The uploaded file must be an image.',
+            'logo.mimes'    => 'Logo must be JPG or PNG.',
+            'logo.max'      => 'Company logo must be less than 1 MB.',
+
+
+
 
         ];
     }

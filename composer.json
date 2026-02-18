@@ -16,10 +16,12 @@
     ],
     "require": {
         "php": "^8.2",
+        "aws/aws-sdk-php": "^3.369",
         "fakerphp/faker": "*",
         "job/shared": "*",
         "laravel/framework": "^12.0",
-        "laravel/tinker": "^2.10.1"
+        "laravel/tinker": "^2.10.1",
+        "league/flysystem-aws-s3-v3": "^3.31"
     },
     "require-dev": {
         "laravel/boost": "^1.8",

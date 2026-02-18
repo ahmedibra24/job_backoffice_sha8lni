@@ -36,7 +36,10 @@
             <thead class="bg-indigo-50">
                 <tr>
                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Company name
+                        Logo
+                    </th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Name
                     </th>
                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Address
@@ -56,16 +59,26 @@
             <tbody class="bg-white divide-y divide-gray-200">
                 @forelse ( $Companies as $Company )               
                 <tr class="hover:bg-indigo-50">
+                    {{--! logo --}}
+                    <td class="px-6 py-4 whitespace-nowrap">
+                            @if ($Company->logoUri)
+                                <img src="{{ Storage::disk('cloud')->url($Company->logoUri) }}" alt="{{ $Company->logoName }}" class="w-10 h-10 rounded-full mr-2 object-cover">
+                            @else
+                                <div class="w-10 h-10 rounded-full mr-2 bg-gray-300 flex items-center justify-center text-gray-600">
+                                    <span class="text-sm font-medium">{{ strtoupper(substr($Company->name, 0, 2)) }}</span>
+                                </div>
+                            @endif  
+                    </td>                  
                     {{--! name --}}
                     <td class="px-6 py-4 whitespace-nowrap">
                         <div class="text-sm text-gray-900">
                             {{--? to display the name as link in index and without link if archived --}}
                             @if (request()->has('archived'))
-                            <span class="text-gray-500">{{ $Company->name }}</span>
+                                <span class="text-gray-500">{{ $Company->name }}</span>
                             @else
-                            <a class="text-blue-600 hover:underline" href="{{ route('company.show', $Company->id) }}">
-                                {{ $Company->name }}
-                            </a>
+                                <a class="text-blue-600 hover:underline" href="{{ route('company.show', $Company->id) }}">
+                                    {{ $Company->name }}
+                                </a>
                             @endif
                         </div>
                     </td>

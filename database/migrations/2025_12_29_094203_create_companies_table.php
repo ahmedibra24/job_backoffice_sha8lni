@@ -18,6 +18,8 @@ return new class extends Migration
             $table->string('address');
             $table->string('industry');
             $table->string('website')->nullable();
+            $table->string('logoName')->nullable();
+            $table->string('logoUri')->nullable();
             $table->softDeletes();
             $table->timestamps();
 

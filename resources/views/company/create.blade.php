@@ -5,10 +5,12 @@
             {{ __('Create New Company') }}
         </h2>
     </x-slot>
+
+     <x-notification-message /> 
     {{--! ============================== MAIN CONTENT ====================================== --}}
     <div class="overflow-x-auto p-6">
         <div class="w-full mx-auto bg-white p-6 rounded-lg shadow">
-            <form method="POST" action="{{ route('company.store') }}" autocomplete="off">
+            <form method="POST" action="{{ route('company.store') }}" autocomplete="off" enctype="multipart/form-data">
                 @csrf
                 <div class="flex flex-row gap-6 justify-center"> 
                     {{--! company section --}}
@@ -57,9 +59,54 @@
                             <label for="website" class="block text-gray-700 font-bold mb-2">Website (optional):</label>
                             <input type="text" value="{{ old('website') }}" name="website" id="website" placeholder="Enter company website" class=" {{ $errors->has('website') ? 'border-red-500' : '' }} w-full border border-gray-300 p-2 rounded placeholder-gray-400" >
                             @error('website')
-                                <div class="text-red-500 text-sm my-2">{{ $message }}</div>
+                            <div class="text-red-500 text-sm my-2">{{ $message }}</div>
                             @enderror   
                         </div>
+                        {{--! logo --}}
+                        {{--? define the file name and error variables --}}
+                        <div class="mt-3"  x-data="{fileName:'', preview: null , hasError:{{ $errors->has('logo')?'true':'false' }} }">
+                        <label for="logo" class="block text-gray-700 font-bold mb-2">Upload logo:</label>
+                        {{--! upload  --}}
+                        <div class="flex items-center">
+                            <div class="flex-1">
+                                <label for="new_logo_file" class="block text-white cursor-pointer ">                                    
+                                    {{--! border style --}}
+                                    <div class="border-2 border-dashed border-gray-600 rounded-lg p-4 hover:border-blue-500 transition"
+                                         :class="{'border-blue-500':fileName, 'border-red-500':hasError}">
+                                         {{--! input--}}
+                                         <input @change="
+                                                let file = $event.target.files[0];
+                                                if(file){
+                                                    fileName = file.name;
+                                                    preview = URL.createObjectURL(file);
+                                                }
+                                            " 
+                                            type="file"name="logo" id="new_logo_file" class="hidden" accept=".jpg,.jpeg,.png">
+                                          {{--! inside text--}}
+                                          <div class="text-center">
+
+                                            {{--? template -> to show one of them --}}
+                                            {{--? if file not uploaded--}}
+                                            <template x-if="!preview">
+                                                <p class="text-gray-400">Click to upload logo (Max 1MB)</p>
+                                            </template>
+                                            
+                                            {{--? if file uploaded--}}
+                                            <template x-if="preview">
+                                                <div>
+                                                    <img :src="preview" alt="Logo Preview" class="mx-auto mb-2 h-20">
+                                                    <p x-text="fileName" class="mt-2 text-blue-400 "></p>
+                                                    <p class="text-gray-400 text-sm mt-1 ">Click to change logo</p>
+                                                </div>
+                                            </template>
+                                          </div>
+                                    </div>
+                                </label>
+                                 <x-input-error :messages="$errors->get('logo')" class="mt-2" />
+                            </div>
+                        </div>
+                        </div>
+                       
                     </div>
                     {{--! owner section --}}
                     <div class=" w-full bg-slate-50 p-6 rounded-lg shadow mb-6">

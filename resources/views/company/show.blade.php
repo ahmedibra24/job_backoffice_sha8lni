@@ -29,6 +29,16 @@ if(Auth::user()->role==='admin'){
         <div class="bg-white shadow-sm rounded-lg p-6 mt-6">
             {{--!  Details Section --}}
             <h3 class="text-lg font-medium text-gray-900 mb-4">Company Details</h3>
+            {{-- logo --}}
+            <div class="mb-4">
+                @if ($company->logoUri)
+                    <img src="{{ Storage::disk('cloud')->url($company->logoUri) }}" alt="{{ $company->logoName }}" class="w-20 h-20 rounded-full object-cover">
+                @else
+                    <div class="w-20 h-20 rounded-full bg-gray-300 flex items-center justify-center text-gray-600">
+                        <span class="text-2xl font-medium">{{ strtoupper(substr($company->name, 0, 2)) }}</span>
+                    </div>
+                @endif
+            </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                     <h4 class="text-sm font-bold text-gray-950">Owner</h4>
