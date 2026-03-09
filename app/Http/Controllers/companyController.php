@@ -163,6 +163,34 @@ class companyController extends Controller
             'email'=>$validated['email'],
         ]);
 
+        //! handle logo update if new logo provided
+        if($request->hasFile('logo')){
+            dd ('logo update logic to be implemented',$request->file('logo'));
+            //! delete old logo from cloud if exists to avoid orphan files
+            if ($company->logoUri) {
+                Storage::disk('cloud')->delete($company->logoUri);
+            }
+            //! validate and extract new logo file
+            $file = $request->file('logo'); // uploaded file
+            $extension = $file->getClientOriginalExtension();
+            $originalFileName = $file->getClientOriginalName(); // stored in DB
+            $fileName = 'logo_' . time() . '.' . $extension; // unique storage name
+
+            //! store in cloud (public visibility)
+            // Returns a relative path like "logos/logo_123456.png"
+            $path=$file->storeAs('logos',$fileName,'cloud',[
+               'disk'=>'cloud',
+               'visibility' => 'public'
+            ]);
+            if (!$path) {
+                throw new \Exception('Failed to upload logo to storage.');
+            }
+             //! update company with new logo data
+             $company->logoName = $originalFileName;
+             $company->logoUri = $path; // should not contain the domain
+             $company->save();
+        }
+
         //! owner update 
         $ownerData=[];
         $ownerData['name']= $validated['owner_name'];

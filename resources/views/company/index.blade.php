@@ -61,13 +61,7 @@
                 <tr class="hover:bg-indigo-50">
                     {{--! logo --}}
                     <td class="px-6 py-4 whitespace-nowrap">
-                            @if ($Company->logoUri)
-                                <img src="{{ Storage::disk('cloud')->url($Company->logoUri) }}" alt="{{ $Company->logoName }}" class="w-10 h-10 rounded-full mr-2 object-cover">
-                            @else
-                                <div class="w-10 h-10 rounded-full mr-2 bg-gray-300 flex items-center justify-center text-gray-600">
-                                    <span class="text-sm font-medium">{{ strtoupper(substr($Company->name, 0, 2)) }}</span>
-                                </div>
-                            @endif  
+                        <x-company-logo :logoUri="$Company->logoUri" :logoName="$Company->logoName" :companyName="$Company->name" />
                     </td>                  
                     {{--! name --}}
                     <td class="px-6 py-4 whitespace-nowrap">
@@ -126,7 +120,7 @@
                 {{--! if no companies found --}}
                 @empty
                 <tr>
-                    <td colspan="5" class="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-500">
+                    <td colspan="6" class="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-500">
                         No companies found.
                     </td>
                 </tr>
