@@ -36,12 +36,22 @@ class companyController extends Controller
     //* ---------------------------------------- index --------------------------------- */ 
     public function index(Request $request)
     {
-        //! check if archived query param exists to show archived companies
+        $query = Company::latest();
+        
+        //! check if archived query param exists to show archived companies and search within them
         if ($request->has('archived')) {
             $query = Company::onlyTrashed()->latest();
-        } else {
-            $query = Company::latest();
         }
+        //! search by company name or industry or adress or website
+        if ($request->has('search')) {
+            $searchTerm = $request->input('search');
+            $query->where(function ($q) use ($searchTerm) {
+                $q->where('name', 'like', '%' . $searchTerm . '%')
+                    ->orWhere('industry', 'like', '%' . $searchTerm . '%')
+                    ->orWhere('address', 'like', '%' . $searchTerm . '%')
+                    ->orWhere('website', 'like', '%' . $searchTerm . '%');
+            });
+        } 
 
         $Companies=$query->paginate(10)->onEachSide(1);
         return view('company.index',compact('Companies'));
@@ -165,7 +175,6 @@ class companyController extends Controller
 
         //! handle logo update if new logo provided
         if($request->hasFile('logo')){
-            dd ('logo update logic to be implemented',$request->file('logo'));
             //! delete old logo from cloud if exists to avoid orphan files
             if ($company->logoUri) {
                 Storage::disk('cloud')->delete($company->logoUri);
@@ -230,6 +239,28 @@ class companyController extends Controller
             return redirect()->route('company.index')->with('success', $company->name.' Company archived successfully');
         }
     }
+
+    //* --------------------------------------- bulk destroy--------------------------------- */
+    public function bulkDestroy(Request $request)
+    {
+        $ids = $request->input('ids', []);
+        if (empty($ids)) {
+            return redirect()->back()->with('error', 'No companies selected for deletion.');
+        }
+        //! check if archived query param exists to delete permanently
+        //! else soft delete
+        if($request->has('archived')){
+            $companies = Company::onlyTrashed()->whereIn('id', $ids)->get();
+            foreach ($companies as $company) {
+                $company->forceDelete();
+            }
+            return redirect()->back()->with('success', 'Selected companies deleted successfully.');
+        } else {
+            Company::whereIn('id', $ids)->delete();
+            return redirect()->route('company.index')->with('success', ' Company archived successfully');
+        }
+        
+    }   
     //* ---------------------------------------- restore--------------------------------- */
     public function restore(string $id)
     {
@@ -237,5 +268,18 @@ class companyController extends Controller
         $company = Company::onlyTrashed()->findOrFail($id);
         $company->restore();
         return redirect()->route('company.index', ['archived' => true])->with('success',  $company->name.' company restored successfully');
+    }
+    //* ---------------------------------------- bulk restore--------------------------------- */
+    public function bulkRestore(Request $request)
+    {
+        $ids = $request->input('ids', []);
+        if (empty($ids)) {
+            return redirect()->back()->with('error', 'No companies selected for restoration.');
+        }
+        $companies = Company::onlyTrashed()->whereIn('id', $ids)->get();
+        foreach ($companies as $company) {
+            $company->restore();
+        }
+        return redirect()->route('company.index', ['archived' => true])->with('success', 'Selected companies restored successfully.');
     }
 }

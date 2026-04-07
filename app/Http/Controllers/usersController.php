@@ -48,4 +48,41 @@ class usersController extends Controller
         $user->restore();
         return redirect()->route('user.index', ['archived' => true])->with('success',  $user->name.' restored successfully');
     }
+
+    //* --------------------------------------- bulk destroy--------------------------------- */
+    public function bulkDestroy(Request $request)
+    {
+        $ids = $request->input('ids', []);
+        if (empty($ids)) {
+            return redirect()->back()->with('error', 'No users selected for deletion.');
+        }
+        //! check if archived query param exists to delete permanently
+        //! else soft delete
+        if($request->has('archived')){
+            $users = User::onlyTrashed()->whereIn('id', $ids)->get();
+            foreach ($users as $user) {
+                $user->forceDelete();
+            }
+            return redirect()->back()->with('success', 'Selected users deleted successfully.');
+        } else {
+            User::whereIn('id', $ids)->delete();
+            return redirect()->route('user.index')->with('success', 'Users archived successfully');
+        }
+        
+    }  
+    
+    //* ---------------------------------------- bulk restore--------------------------------- */
+    public function bulkRestore(Request $request)
+    {
+        $ids = $request->input('ids', []);
+        if (empty($ids)) {
+            return redirect()->back()->with('error', 'No users selected for restoration.');
+        }
+        $users = User::onlyTrashed()->whereIn('id', $ids)->get();
+        foreach ($users as $user) {
+            $user->restore();
+        }
+        return redirect()->route('user.index', ['archived' => true])->with('success', 'Selected users restored successfully.');
+    }
+
 }

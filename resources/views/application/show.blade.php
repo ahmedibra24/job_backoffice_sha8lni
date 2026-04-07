@@ -28,7 +28,10 @@
                 </div>
                 <div>
                     <h4 class="text-sm font-bold text-gray-950">Company</h4>
-                    <p class="mt-1 text-gray-800">{{ $application->jobVacancy?->company->name  ?? 'N/A'}}</p>
+                    <div class="flex mt-2 ">
+                        <x-company-logo :logoUri="$application->jobVacancy?->company->logoUri" :logoName="$application->jobVacancy?->company->name" :companyName="$application->jobVacancy?->company->name" class="w-8 h-8 rounded-full mr-2 object-cover"/>
+                        <p class="mt-1 text-gray-800">{{ $application->jobVacancy?->company->name  ?? 'N/A'}}</p>
+                    </div>
                 </div>
                 <div>
                     <h4 class="text-sm font-bold text-gray-950">Status</h4>

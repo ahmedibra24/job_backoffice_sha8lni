@@ -95,4 +95,41 @@ class applicationController extends Controller
         return redirect()->route('application.index', ['archived' => true])->with('success',  ' application restored successfully');
     }
 
+    //* --------------------------------------- bulk destroy--------------------------------- */
+    public function bulkDestroy(Request $request)
+    {
+        $ids = $request->input('ids', []);
+        if (empty($ids)) {
+            return redirect()->back()->with('error', 'No applications selected for deletion.');
+        }
+        //! check if archived query param exists to delete permanently
+        //! else soft delete
+        if($request->has('archived')){
+            $applications = JobApplication::onlyTrashed()->whereIn('id', $ids)->get();
+            foreach ($applications as $application) {
+                $application->forceDelete();
+            }
+            return redirect()->back()->with('success', 'Selected applications deleted successfully.');
+        } else {
+            JobApplication::whereIn('id', $ids)->delete();
+            return redirect()->route('application.index')->with('success', ' Application archived successfully');
+        }
+        
+    }  
+    
+    //* ---------------------------------------- bulk restore--------------------------------- */
+    public function bulkRestore(Request $request)
+    {
+        $ids = $request->input('ids', []);
+        if (empty($ids)) {
+            return redirect()->back()->with('error', 'No applications selected for restoration.');
+        }
+        $applications = JobApplication::onlyTrashed()->whereIn('id', $ids)->get();
+        foreach ($applications as $application) {
+            $application->restore();
+        }
+        return redirect()->route('application.index', ['archived' => true])->with('success', 'Selected applications restored successfully.');
+    }
+
+
 }

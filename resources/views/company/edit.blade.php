@@ -20,7 +20,7 @@ if(Auth::user()->role==='admin'){
 {{--! ============================== MAIN CONTENT ====================================== --}}
     <div class="overflow-x-auto p-6">
         <div class="w-full mx-auto bg-white p-6 rounded-lg shadow">
-            <form method="POST" action="{{ $formRoute }}" autocomplete="off">
+            <form method="POST" action="{{ $formRoute }}" autocomplete="off" enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
                 <div class="flex flex-row gap-6 justify-center"> 

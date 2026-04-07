@@ -16,19 +16,20 @@ class jobVacancyController extends Controller
     //* =======================================index======================================== */
     public function index(Request $request)
     {
+        $query = JobVacancy::latest();
+
         //! check if archived query param exists to show archived job vacancies
-        //! also if the user is recruiter show only his company vacancies
         if ($request->has('archived')) {
             $query = JobVacancy::onlyTrashed()->latest();
-            if(Auth::user()->role=='recruiter'){
-                $query->where('company_id',Auth::user()->companies->id);
-            }
-        } else {
-            $query = JobVacancy::latest();
-            if(Auth::user()->role=='recruiter'){
-                $query->where('company_id',Auth::user()->companies->id);
-            }
         }
+
+        //! if the user is recruiter show only his company vacancies
+        if(Auth::user()->role=='recruiter'){
+            $query->where('company_id',Auth::user()->companies->id);
+        }
+
+        //! search by 
+
 
         $JobVacancies=$query->paginate(10)->onEachSide(1);
 
@@ -125,4 +126,41 @@ class jobVacancyController extends Controller
         $jobVacancy->restore();
         return redirect()->route('job-vacancy.index',['archived' => true])->with('success',  $jobVacancy->title.' job vacancy restored successfully');
     }
+
+    //* --------------------------------------- bulk destroy--------------------------------- */
+    public function bulkDestroy(Request $request)
+    {
+        $ids = $request->input('ids', []);
+        if (empty($ids)) {
+            return redirect()->back()->with('error', 'No job vacancies selected for deletion.');
+        }
+        //! check if archived query param exists to delete permanently
+        //! else soft delete
+        if($request->has('archived')){
+            $jobVacancies = JobVacancy::onlyTrashed()->whereIn('id', $ids)->get();
+            foreach ($jobVacancies as $jobVacancy) {
+                $jobVacancy->forceDelete();
+            }
+            return redirect()->back()->with('success', 'Selected job vacancies deleted successfully.');
+        } else {
+            JobVacancy::whereIn('id', $ids)->delete();
+            return redirect()->route('job-vacancy.index')->with('success', 'Selected job vacancies archived successfully');
+        }
+        
+    }  
+    
+    //* ---------------------------------------- bulk restore--------------------------------- */
+    public function bulkRestore(Request $request)
+    {
+        $ids = $request->input('ids', []);
+        if (empty($ids)) {
+            return redirect()->back()->with('error', 'No job vacancies selected for restoration.');
+        }
+        $jobVacancies = JobVacancy::onlyTrashed()->whereIn('id', $ids)->get();
+        foreach ($jobVacancies as $jobVacancy) {
+            $jobVacancy->restore();
+        }
+        return redirect()->route('job-vacancy.index', ['archived' => true])->with('success', 'Selected job vacancies restored successfully.');
+    }
+
 }
