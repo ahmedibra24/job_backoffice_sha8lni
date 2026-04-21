@@ -11,28 +11,66 @@ class applicationController extends Controller
 {
     //* ---------------------------------------- index--------------------------------- */
     public function index(Request $request)
-    {
+    {    
+        $query = JobApplication::latest();
+
         //! check if archived query param exists to show archived applications
-        //! also if the user is recruiter show only applications related to his company vacancies
-
-        //? whereHas -> This would return only job vacancies that are related to active user.
-
         if ($request->has('archived')) {
             $query = JobApplication::onlyTrashed()->latest();
-            if(Auth::user()->role=='recruiter'){
-                $query->whereHas('jobVacancy',function($q){
-                    $q->where('company_id',Auth::user()->companies->id);
-                });
-            }
-        } else {
-            $query = JobApplication::latest();
-            if(Auth::user()->role=='recruiter'){
-                $query->whereHas('jobVacancy',function($q){
-                    $q->where('company_id',Auth::user()->companies->id);
-                });
-            }
-
         }
+        
+        //! also if the user is recruiter show only applications related to his company vacancies
+        //? whereHas -> This would return only job vacancies that are related to active user.
+        if(Auth::user()->role=='recruiter'){
+            $query->whereHas('jobVacancy',function($q){
+                $q->where('company_id',Auth::user()->companies->id);
+            });
+        }
+
+        //!search & filter by status
+        if ($request->has('search') && $request->has('filter')) {
+            $search = $request->get('search');
+            $filter = $request->get('filter');
+            $query->where(function ($q) use ($search, $filter) {
+                $q->whereHas('applicant', function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%");
+                })
+                    ->orWhere('status', 'like', "%{$search}%")
+                    ->orWhereHas('jobVacancy', function ($q) use ($search) {
+                    $q->where('title', 'like', "%{$search}%")
+                        ->orWhereHas('company', function ($q) use ($search) {
+                        $q->where('name', 'like', "%{$search}%");
+                        });
+                    })
+                    ->where('status', 'like', "%{$filter}%");
+            });
+        }
+
+
+        //! search by applicant name, company name, job vacancy title and status
+        if ($request->has('search')&& $request->filter == null) {
+            $search = $request->get('search');
+            $query->where(function ($q) use ($search) {
+            $q->whereHas('applicant', function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%");
+            })
+                ->orWhere('status', 'like', "%{$search}%")
+                ->orWhereHas('jobVacancy', function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                    ->orWhereHas('company', function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%");
+                    });
+                });
+            });
+        }
+
+        //! filter by status
+        if ($request->has('filter')&& $request->search == null) {
+            $filter = $request->get('filter');
+            $query->where('status', 'like', "%{$filter}%");
+        }
+
+        
         $applications=$query->paginate(10)->onEachSide(1);
 
         return view('application.index',compact('applications'));

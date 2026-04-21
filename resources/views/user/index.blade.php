@@ -19,6 +19,10 @@
         <x-action-buttons :indexRoute="route('user.index')" />
     </div>
 
+    {{--! role filter --}}
+    <div class="mr-6 mt-6 mb-3">
+        <x-filter :route="'user.index'" :options="['recruiter','applicant']" />
+    </div>
 
     {{--! show notification  --}}
     <x-notification-message />

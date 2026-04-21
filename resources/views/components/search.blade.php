@@ -13,9 +13,14 @@
             <input type="hidden" name="archived" value="true">                            
             @endif
         </div>
+        {{--? to keep the filter with search --}}
+        @if (request()->has('filter'))
+            <input type="hidden" name="filter" value="{{ request('filter') }}">                            
+        @endif
+
         {{--! clear search --}}
         @if (request()->has('search'))
-            <a href="{{route($route,['archived'=>request('archived') ? 'true' : null])}}"
+            <a href="{{route($route,['archived'=>request('archived') ? 'true' : null , 'filter'=>request('filter')])}}"
              class="px-4 py-2  hover:cursor-pointer hover:border-spacing-1">
              clear
             </a>

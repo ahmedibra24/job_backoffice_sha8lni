@@ -12,7 +12,7 @@
         </h2>
     </x-slot>
     
-    {{--! ============================== ACTION BUTTONS AND SEARCH ====================================== --}}
+    {{--! ============================== ACTION BUTTONS, SEARCH AND FILTER ====================================== --}}
     <div class="mr-6 mt-6 mb-3 flex items-center justify-end gap-x-3">
         {{--! search form  --}}
         <x-search :route="'application.index'" :placeholder="__('Search for an application')" />
@@ -20,6 +20,12 @@
         {{--! action buttons  --}}
         <x-action-buttons :indexRoute="route('application.index')" />
     </div>
+
+    {{--! status filter --}}
+    <div class="mr-6 mb-3 flex items-center justify-end gap-x-3">
+        <x-filter :route="'application.index'" :options="['pending', 'accepted', 'rejected']" />
+    </div>
+
 
     {{--! show notification  --}}
     <x-notification-message />

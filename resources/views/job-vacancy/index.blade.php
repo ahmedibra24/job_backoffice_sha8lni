@@ -11,7 +11,7 @@
         </h2>
     </x-slot>
 
-    {{--! ============================== ACTION BUTTONS AND SEARCH ====================================== --}}
+    {{--! ============================== ACTION BUTTONS, SEARCH AND FILTER ====================================== --}}
     <div class="mr-6 mt-6 mb-3 flex items-center justify-end gap-x-3">
         {{--! search form  --}}
         <x-search :route="'job-vacancy.index'" :placeholder="__('Search for a job vacancy')" />
@@ -20,7 +20,10 @@
         <x-action-buttons :indexRoute="route('job-vacancy.index')" :addRoute="route('job-vacancy.create')" />
     </div>
 
-
+    {{--! type filter --}}
+    <div class="mr-6 mb-3">
+        <x-filter :route="'job-vacancy.index'" :options="['Full-time', 'Contract', 'Remote', 'Hybrid']" />
+    </div>
 
     {{--! show notification  --}}
     <x-notification-message />

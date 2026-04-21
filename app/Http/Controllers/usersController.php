@@ -13,12 +13,41 @@ class usersController extends Controller
     //* ======================================= index ======================================== */
     public function index(Request $request)
     {
+        $query = User::latest();
+
         //! check if archived query param exists to show archived users
         if ($request->has('archived')) {
             $query = User::onlyTrashed()->latest();
-        } else {
-            $query = User::latest();
         }
+        
+        //! search by name, email and role with filter by role
+        if ($request->has('search') && $request->has('filter')) {
+            $search = $request->get('search');
+            $filter = $request->get('filter');
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhere('role', 'like', "%{$search}%");
+            });
+            $query->where('role', 'like', "%{$filter}%");
+         }
+
+        //! serach by name, email and role
+        if ($request->has('search') && $request->filter == null) {
+            $search = $request->get('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhere('role', 'like', "%{$search}%");
+            });
+        }
+
+        //! filter by role
+        if ($request->has('filter') && $request->search == null) {
+            $filter = $request->get('filter');
+            $query->where('role', 'like', "%{$filter}%");
+        }
+        
         $users=$query->paginate(10)->onEachSide(1);
         return view('user.index',compact('users'));
     }

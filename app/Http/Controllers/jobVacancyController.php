@@ -28,8 +28,41 @@ class jobVacancyController extends Controller
             $query->where('company_id',Auth::user()->companies->id);
         }
 
-        //! search by 
+        //! search by title, company name, location , type and salary with filter by type
+        if ($request->has('search') && $request->has('filter')) {
+            $search = $request->get('search');
+            $filter = $request->get('filter');
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                    ->orWhere('location', 'like', "%{$search}%")
+                    ->orWhereHas('company', function ($q) use ($search) {
+                        $q->where('name', 'like', "%{$search}%");
+                    })
+                    ->orWhere('type', 'like', "%{$search}%")
+                    ->orWhere('salary', 'like', "%{$search}%");
+            });
+            $query->where('type', 'like', "%{$filter}%");
+            }
 
+        //! search by title, company name, location , type and salary
+        if ($request->has('search') && $request->filter == null) {
+            $search = $request->get('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                    ->orWhere('location', 'like', "%{$search}%")
+                    ->orWhereHas('company', function ($q) use ($search) {
+                        $q->where('name', 'like', "%{$search}%");
+                    })
+                    ->orWhere('type', 'like', "%{$search}%")
+                    ->orWhere('salary', 'like', "%{$search}%");
+            });
+        }
+
+        //! filter by type
+        if ($request->has('filter') && $request->search == null) {
+            $filter = $request->get('filter');
+            $query->where('type', 'like', "%{$filter}%");
+        }
 
         $JobVacancies=$query->paginate(10)->onEachSide(1);
 
