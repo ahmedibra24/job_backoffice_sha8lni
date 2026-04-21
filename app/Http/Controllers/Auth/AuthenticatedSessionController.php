@@ -11,7 +11,7 @@ use Illuminate\View\View;
 
 class AuthenticatedSessionController extends Controller
 {
-    /**
+    /**4
      * Display the login view.
      */
     public function create(): View
@@ -25,8 +25,9 @@ class AuthenticatedSessionController extends Controller
     public function store(LoginRequest $request): RedirectResponse
     {
         $request->authenticate();
-
-        $request->session()->regenerate();
+        // remember me $request->remember ? false : true
+        // if remember me is checked, do not regenerate the session, otherwise regenerate it
+        $request->session()->regenerate($request->remember ? false : true);
 
         return redirect()->intended(route('dashboard', absolute: false));
     }
