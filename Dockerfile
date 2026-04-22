@@ -43,6 +43,9 @@ RUN npm install
 # Copy the rest of the application to work directory 
 COPY . .
 
+# Copy SSL certs
+COPY certs /app/certs
+
 # Copy PHP configuration - (additional instructions to php)
 COPY php.ini /usr/local/etc/php/conf.d/custom.ini
 
