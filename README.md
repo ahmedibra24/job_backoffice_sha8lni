@@ -1,3 +1,8 @@
+<p align="center">
+  <img src="./public/images/logo.png" width="150" />
+</p>
+
+
 # 📊 Recruitment Management Dashboard
 
 A powerful admin and company dashboard designed to manage the entire recruitment process, with advanced analytics and AI-driven insights.
