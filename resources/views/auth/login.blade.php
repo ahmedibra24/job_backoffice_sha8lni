@@ -55,6 +55,7 @@
         </div>
 
 
+
         <div class="flex items-center justify-end mt-4">
             @if (Route::has('password.request'))
                 <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('password.request') }}">
@@ -67,4 +68,26 @@
             </x-primary-button>
         </div>
     </form>
+
+
+    {{--! demo admin email and password --}}
+    {{-- <div class="text-xs text-gray-700 mt-10 text-center   ">
+        <h4 class="underline mb-1 text-sm ">Demo email & password</h4>
+        <p>email : admin@admin.com</p>
+        <p>password : 12345678</p>
+    </div> --}}
+
+<div class="mt-6 p-4 rounded-lg bg-blue-50 border border-blue-200 text-blue-800 text-center">
+    <h4 class="text-sm font-semibold mb-1 underline">
+        Demo Login
+    </h4>
+
+    <p class="text-xs">
+        Email: admin@admin.com
+    </p>
+    <p class="text-xs">
+        Password: 12345678
+    </p>
+</div>
 </x-guest-layout>
+
