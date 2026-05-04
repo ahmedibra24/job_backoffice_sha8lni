@@ -25,7 +25,7 @@ return new class extends Migration
 
             //* reference to owner_id in users table
             $table->uuid('owner_id');
-            $table->foreign('owner_id')->references('id')->on('users')->onDelete('restrict');
+            $table->foreign('owner_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 

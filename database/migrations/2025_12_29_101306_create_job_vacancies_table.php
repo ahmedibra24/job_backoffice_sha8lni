@@ -22,9 +22,9 @@ return new class extends Migration
             $table->timestamps();
             //* foreign keys
             $table->uuid('company_id');
-            $table->foreign('company_id')->references('id')->on('companies')->onDelete('restrict'); 
-            $table->uuid('category_id');
-            $table->foreign('category_id')->references('id')->on('job_categories')->onDelete('restrict');   
+            $table->foreign('company_id')->references('id')->on('companies')->onDelete('cascade');
+            $table->uuid('category_id')->nullable();
+            $table->foreign('category_id')->references('id')->on('job_categories')->onDelete('set null');   
 
         
         });

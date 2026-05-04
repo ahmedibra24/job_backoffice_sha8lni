@@ -24,7 +24,7 @@ return new class extends Migration
             $table->timestamps();
             //* reference to applicant_id in users table
             $table->uuid('applicant_id');
-            $table->foreign('applicant_id')->references('id')->on('users')->onDelete('restrict');
+            $table->foreign('applicant_id')->references('id')->on('users')->onDelete('cascade');
 
         });
     }

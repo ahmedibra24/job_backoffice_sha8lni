@@ -21,11 +21,11 @@ return new class extends Migration
 
             //* foreign keys
             $table->uuid('job_vacancy_id');
-            $table->foreign('job_vacancy_id')->references('id')->on('job_vacancies')->onDelete('restrict');
-            $table->uuid('resume_id');
-            $table->foreign('resume_id')->references('id')->on('resumes')->onDelete('restrict');
+            $table->foreign('job_vacancy_id')->references('id')->on('job_vacancies')->onDelete('cascade');
+            $table->uuid('resume_id')->nullable();
+            $table->foreign('resume_id')->references('id')->on('resumes')->onDelete('set null');
             $table->uuid('applicant_id');
-            $table->foreign('applicant_id')->references('id')->on('users')->onDelete('restrict');
+            $table->foreign('applicant_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 
