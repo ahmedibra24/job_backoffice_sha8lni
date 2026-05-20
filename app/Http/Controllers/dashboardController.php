@@ -41,7 +41,10 @@ class dashboardController extends Controller
         //? ) AS total_applications
         //?     FROM job_vacancies ORDER BY total_applications DESC LIMIT 5;
 
-       $mostAppliedJob = JobVacancy::withCount('jobApplications as total_applications')
+       $mostAppliedJob = JobVacancy::with(['company' => function ($query) {
+            $query->withTrashed();
+       }])
+       ->withCount('jobApplications as total_applications')
        ->whereNull('deleted_at')// only not deleted jobs (you can not write it because it's default behavior in laravel with soft deletes)
        ->orderBy('total_applications','desc')
        ->limit(5)

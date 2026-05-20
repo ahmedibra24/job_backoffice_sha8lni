@@ -114,7 +114,11 @@
                             <form action="{{ route('company.restore', $Company->id) }}" method="POST" class="inline">
                                 @csrf
                                 @method('PUT')
+                                @if (! $Company->owner)
+                                <span class="text-xs text-gray-500">the owner is deleted</span>
+                                @else
                                 <button type="submit" class="text-green-600 hover:text-green-900"> 🔄 Restore</button>
+                                @endif
                             </form>
                             <form action="{{ route('company.destroy', $Company->id) }}?archived=true" method="POST" class="inline">
                                 @csrf

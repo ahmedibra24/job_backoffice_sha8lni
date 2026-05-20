@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Company;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -59,11 +60,13 @@ class usersController extends Controller
         //! else soft delete
         if($request->has('archived')){
             $user = User::onlyTrashed()->findOrFail($id);
+            Company::withTrashed()->where('owner_id', $user->id)->get()->each->forceDelete();
             $user->forceDelete();
             return redirect()->route('user.index', ['archived' => true])->with('success',  ' user deleted permanently successfully');
         }
         else{
             $user = User::findOrFail($id);
+            Company::where('owner_id', $user->id)->get()->each->delete();
             $user->delete();
             return redirect()->route('user.index')->with('success', $user->name.'  archived successfully');
         }
@@ -75,6 +78,7 @@ class usersController extends Controller
         //! restore soft deleted user
         $user = User::onlyTrashed()->findOrFail($id);
         $user->restore();
+        Company::onlyTrashed()->where('owner_id', $user->id)->get()->each->restore();
         return redirect()->route('user.index', ['archived' => true])->with('success',  $user->name.' restored successfully');
     }
 
@@ -90,11 +94,16 @@ class usersController extends Controller
         if($request->has('archived')){
             $users = User::onlyTrashed()->whereIn('id', $ids)->get();
             foreach ($users as $user) {
+                Company::withTrashed()->where('owner_id', $user->id)->get()->each->forceDelete();
                 $user->forceDelete();
             }
             return redirect()->back()->with('success', 'Selected users deleted successfully.');
         } else {
-            User::whereIn('id', $ids)->delete();
+            $users = User::whereIn('id', $ids)->get();
+            foreach ($users as $user) {
+                Company::where('owner_id', $user->id)->get()->each->delete();
+                $user->delete();
+            }
             return redirect()->route('user.index')->with('success', 'Users archived successfully');
         }
         
@@ -110,6 +119,7 @@ class usersController extends Controller
         $users = User::onlyTrashed()->whereIn('id', $ids)->get();
         foreach ($users as $user) {
             $user->restore();
+            Company::onlyTrashed()->where('owner_id', $user->id)->get()->each->restore();
         }
         return redirect()->route('user.index', ['archived' => true])->with('success', 'Selected users restored successfully.');
     }

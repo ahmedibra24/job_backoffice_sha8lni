@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\Hash;
 use Pest\Matchers\Any;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
+use PHPUnit\Util\PHP\Job;
+use App\Models\JobVacancy;
 
 class companyController extends Controller
 {
@@ -230,11 +232,13 @@ class companyController extends Controller
         //! else soft delete
         if($request->has('archived')){
             $company = Company::onlyTrashed()->findOrFail($id);
+            JobVacancy::where('company_id', $company->id)->withTrashed()->get()->each->forceDelete();
             $company->forceDelete();
             return redirect()->route('company.index', ['archived' => true])->with('success',  $company->name.' Company deleted permanently successfully');
         }
         else{
             $company = Company::findOrFail($id);
+            JobVacancy::where('company_id', $company->id)->delete();
             $company->delete();
             return redirect()->route('company.index')->with('success', $company->name.' Company archived successfully');
         }
@@ -256,7 +260,11 @@ class companyController extends Controller
             }
             return redirect()->back()->with('success', 'Selected companies deleted successfully.');
         } else {
-            Company::whereIn('id', $ids)->delete();
+            $companies = Company::whereIn('id', $ids)->get();
+            foreach ($companies as $company) {
+                JobVacancy::where('company_id', $company->id)->get()->each->delete(); //? soft delete related job vacancies to avoid orphan records
+                $company->delete();
+            }
             return redirect()->route('company.index')->with('success', ' Company archived successfully');
         }
         
@@ -267,6 +275,7 @@ class companyController extends Controller
         //! restore soft deleted company
         $company = Company::onlyTrashed()->findOrFail($id);
         $company->restore();
+        JobVacancy::where('company_id', $company->id)->onlyTrashed()->get()->each->restore();
         return redirect()->route('company.index', ['archived' => true])->with('success',  $company->name.' company restored successfully');
     }
     //* ---------------------------------------- bulk restore--------------------------------- */
@@ -279,6 +288,7 @@ class companyController extends Controller
         $companies = Company::onlyTrashed()->whereIn('id', $ids)->get();
         foreach ($companies as $company) {
             $company->restore();
+            JobVacancy::where('company_id', $company->id)->withTrashed()->get()->each->restore(); //? restore related job vacancies
         }
         return redirect()->route('company.index', ['archived' => true])->with('success', 'Selected companies restored successfully.');
     }

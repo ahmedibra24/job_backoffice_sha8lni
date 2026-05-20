@@ -85,7 +85,7 @@
                                 {{--? display company name only for admin --}}
                                 @if (Auth::user()->role == 'admin')
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm text-gray-900">{{ $job->company->name }}</div>
+                                    <div class="text-sm text-gray-900">{{ $job->company?->name ?? 'N/A' }}</div>
                                 </td>
                                 @endif
                                 {{--! number of applications --}}
@@ -142,7 +142,7 @@
                                     <div class="text-sm text-gray-900"> {{ $job->conversionRate }}</div>
                                 </td>
                             </tr>
-                            @endforeach ()  
+                            @endforeach
                         </tbody>
                     </table>
                 </div>

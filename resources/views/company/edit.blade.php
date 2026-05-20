@@ -143,7 +143,7 @@ if(Auth::user()->role==='admin'){
                         {{--! name --}}
                         <div class="mb-4">
                             <label for="owner_name" class="block text-gray-700 font-bold mb-2"> Owner Name:</label>
-                            <input type="text" value="{{ old('owner_name', $company->owner->name) }}" name="owner_name" id="owner_name"  placeholder="Enter owner name" class="{{ $errors->has('owner_name') ? 'border-red-500' : '' }} w-full border border-gray-300 p-2 rounded placeholder-gray-400" >
+                            <input type="text" value="{{ old('owner_name', $company->owner->name)  }}" name="owner_name" id="owner_name"  placeholder="Enter owner name" class="{{ $errors->has('owner_name') ? 'border-red-500' : '' }} w-full border border-gray-300 p-2 rounded placeholder-gray-400" >
                             @error('owner_name')
                                 <div class="text-red-500 text-sm my-2">{{ $message }}</div>
                             @enderror

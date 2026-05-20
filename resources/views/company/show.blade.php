@@ -40,11 +40,11 @@ if(Auth::user()->role==='admin'){
                 </div>
                 <div>
                     <h4 class="text-sm font-bold text-gray-950">Email</h4>
-                    <p class="mt-1 text-gray-800">{{ $company->owner->email }}</p>
+                    <p class="mt-1 text-gray-800">{{ $company->owner->email  }}</p>
                 </div>
                 <div>
                     <h4 class="text-sm font-bold text-gray-950">Address</h4>
-                    <p class="mt-1 text-gray-800">{{ $company->address }}</p>
+                    <p class="mt-1 text-gray-800">{{ $company->address  }}</p>
                 </div>
                 <div>
                     <h4 class="text-sm font-bold text-gray-950">Industry</h4>
@@ -59,9 +59,9 @@ if(Auth::user()->role==='admin'){
             </div>
             {{--! action buttons --}}
             <div class=" w-full mt-6 flex justify-end gap-x-1">
-                <a href="{{$routeParam}}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Edit</a>
+                <a href="{{$routeParam}}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disable">Edit</a>
                 {{--? display delete button only for admin --}}
-                @if (Auth::user()->role == 'admin')
+                @if (Auth::user()->role == 'admin' )
                 <form action="{{ route('company.destroy', $company->id) }}" method="POST" class="inline-block">
                     @csrf
                     @method('DELETE')
